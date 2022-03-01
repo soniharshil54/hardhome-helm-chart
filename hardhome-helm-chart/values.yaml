@@ -1,3 +1,13 @@
 # Default values for hardhome-helm-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+backendCore:
+  backendServerHost: hardhome-backend-service
+  backendServerPort: 3010
+
+common:
+  awsAccessKey: dummy-aws-access-key-helm-value
+  awsSecretKey: dummy-aws-secret-key-helm-value
+  # awsSecretKey: ZHVtbXktYXdzLXNlY3JldC1rZXktaGVsbS12YWx1ZQ==
+  

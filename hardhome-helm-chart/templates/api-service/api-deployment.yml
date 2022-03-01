@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hardhome-api-deployment
+  labels:
+    app: hardhome-api-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: hardhome-api-pod
+  template:
+    metadata:
+      labels: 
+        name: hardhome-api-pod
+        app: hardhome-api-app
+        kick: hardhome-api-pod
+    spec:    
+      containers:
+        - name: hardhome-api-container
+          image: 121487958432.dkr.ecr.us-east-1.amazonaws.com/hardhome-api-service-image-prod:latest     
+          ports:
+            - containerPort: 3020       
+          env: 
+            - name: BACKEND_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: backend-server-host
+            - name: BACKEND_SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: backend-server-port
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hardhome-secret
+                  key: aws-access-key    
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hardhome-secret
+                  key: aws-secret-key             
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: api-server-port  
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3020
+              httpHeaders:
+              - name: Custom-Header
+                value: Awesome
+            initialDelaySeconds: 3
+            periodSeconds: 3         
+      imagePullSecrets:
+        - name: us-east-1-ecr-registry             
