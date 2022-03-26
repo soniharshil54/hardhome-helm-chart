@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: hardhome-backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hardhome-backend-app
+  template:
+    metadata:
+      labels:
+        name: hardhome-backend-pod
+        app: hardhome-backend-app
+    spec:
+      containers:
+        - name: hardhome-backend-container
+          image: 121487958432.dkr.ecr.us-east-1.amazonaws.com/hardhome-backend-service-image-prod:latest  
+          imagePullPolicy: Never     
+          ports:
+            - containerPort: 3010       
+          env: 
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: mongo-host
+            - name: MONGO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: mongo-port
+            - name: MONGO_INITDB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: mongo-db
+            - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: mongodb-username
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: mongodb-password      
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: aws-access-key     
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hardhome-env-config-map
+                  key: backend-server-port 
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3010
+              httpHeaders:
+              - name: Custom-Header
+                value: Awesome
+            initialDelaySeconds: 3
+            periodSeconds: 3          
+      imagePullSecrets:
+        - name: us-east-1-ecr-registry  

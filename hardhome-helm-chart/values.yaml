@@ -2,6 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+adminCore:
+  adminServerPort: 3020
+
 backendCore:
   backendServerHost: hardhome-backend-service
   backendServerPort: 3010
